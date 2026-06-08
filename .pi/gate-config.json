@@ -1,0 +1,17 @@
+{
+  "patterns": [
+    "rm -rf",
+    "rm -r ",
+    "sudo rm",
+    "git push --force",
+    "git push -f",
+    "git reset --hard",
+    "> /dev/",
+    "DROP TABLE",
+    "DROP DATABASE",
+    "chmod 777",
+    "chmod -R 777",
+    ":(){:|:&};:"
+  ],
+  "protectedPaths": [".env", ".env.local", ".env.production", "node_modules/"]
+}
