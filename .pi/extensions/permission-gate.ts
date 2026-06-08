@@ -75,6 +75,33 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
+  // Intercept edit tool calls for protected files
+  pi.on("tool_call", async (event, ctx) => {
+    if (!isToolCallEventType("edit", event)) return;
+
+    const path = event.input.path ?? "";
+
+    const isProtected = protectedPaths.some(
+      (p) => path === p || path.endsWith(`/${p}`) || path.includes(`/${p}/`),
+    );
+
+    if (isProtected) {
+      const ok = await ctx.ui.confirm(
+        "Protected file",
+        `The agent wants to edit:\n\n${path}\n\nAllow?`,
+        { timeout: 30_000 }, // auto-deny after 30 seconds
+      );
+
+      if (!ok) {
+        pi.appendEntry("permission-gate", {
+          blocked: path,
+          reason: "protected path",
+        });
+        return { block: true, reason: `Blocked: ${path} is a protected file` };
+      }
+    }
+  });
+
   // Intercept write tool calls for protected files
   pi.on("tool_call", async (event, ctx) => {
     if (!isToolCallEventType("write", event)) return;
